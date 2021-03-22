@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 import Masonry from 'react-masonry-component';
-import useBgImageData from '../../hooks/useBgImageData';
+import { BGTags } from '../../hooks/__generated__/BGTags';
 import ImageCard from '../ImageCard/ImageCard';
 
 const LazyLightbox = React.lazy(() => import('react-image-lightbox'));
 
-const BgImageContainer = (): JSX.Element => {
+const BgImageContainer = ({ desktopBgImage, mobileBgImage }: BGTags): JSX.Element => {
   const isSSR = typeof window === 'undefined';
-  const {
-    desktopBgImage: { edges: desktopBgImage },
-    mobileBgImage: { edges: mobileBgImage },
-  } = useBgImageData();
+  const { edges: desktopBgImageArray } = desktopBgImage;
+  const { edges: mobileBgImageArray } = mobileBgImage;
 
   const [isOpen, setOpen] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
 
-  const zippedImages = desktopBgImage.map((element, index) => {
-    return [element, mobileBgImage[index]];
+  const zippedImages = desktopBgImageArray.map((element, index) => {
+    return [element, mobileBgImageArray[index]];
   });
 
   return (
@@ -37,7 +35,7 @@ const BgImageContainer = (): JSX.Element => {
               setPhotoIndex={setPhotoIndex}
               key={desktopImage.node.id}
               sources={sources}
-              edges={desktopBgImage}
+              edges={desktopBgImageArray}
               node={desktopImage.node}
             />
           );
@@ -46,15 +44,16 @@ const BgImageContainer = (): JSX.Element => {
       {!isSSR && isOpen && (
         <React.Suspense fallback={<h1>Loading...</h1>}>
           <LazyLightbox
-            mainSrc={desktopBgImage[photoIndex].node.fixed.src}
-            nextSrc={desktopBgImage[(photoIndex + 1) % desktopBgImage.length].node.fixed.src}
+            mainSrc={desktopBgImageArray[photoIndex].node.fixed.src}
+            nextSrc={desktopBgImageArray[(photoIndex + 1) % desktopBgImageArray.length].node.fixed.src}
             prevSrc={
-              desktopBgImage[(photoIndex + desktopBgImage.length - 1) % desktopBgImage.length].node.fixed.src
+              desktopBgImageArray[(photoIndex + desktopBgImageArray.length - 1) % desktopBgImageArray.length]
+                .node.fixed.src
             }
             onMovePrevRequest={() =>
-              setPhotoIndex((photoIndex + desktopBgImage.length - 1) % desktopBgImage.length)
+              setPhotoIndex((photoIndex + desktopBgImageArray.length - 1) % desktopBgImageArray.length)
             }
-            onMoveNextRequest={() => setPhotoIndex((photoIndex + 1) % desktopBgImage.length)}
+            onMoveNextRequest={() => setPhotoIndex((photoIndex + 1) % desktopBgImageArray.length)}
             onCloseRequest={() => setOpen(!isOpen)}
             clickOutsideToClose
             discourageDownloads={false}

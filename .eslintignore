@@ -5,3 +5,8 @@ gatsby-node.js
 gatsby-browser.js
 cypress/**/*
 instrumented
+__mocks__/
+.cache/
+jest-preprocess.js
+jest.config.js
+loadershim.js
