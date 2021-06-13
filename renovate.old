@@ -1,5 +1,0 @@
-{
-  baseBranches: ['develop'],
-  extends: ['config:base', 'schedule:daily'],
-  masterIssueApproval: true,
-}

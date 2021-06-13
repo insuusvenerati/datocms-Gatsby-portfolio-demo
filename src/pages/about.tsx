@@ -5,7 +5,7 @@ import { HelmetDatoCms } from 'gatsby-source-datocms';
 import ContactPage from '../gatsby-theme-contact/components/contact-page';
 import React from 'react';
 import Layout from '../components/Layout';
-import * as Sentry from '@sentry/react';
+import * as Sentry from '@sentry/gatsby';
 import { AboutQuery } from './__generated__/AboutQuery';
 
 type AboutPageProps = {

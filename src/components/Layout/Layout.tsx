@@ -48,8 +48,8 @@ const Layout: React.FC = ({ children }) => {
               </Link>
             </li>
             <li>
-              <Link activeStyle={{ color: '#5d6b5b' }} to="/visdev">
-                visdev
+              <Link activeStyle={{ color: '#5d6b5b' }} to="/sketchbook">
+                sketchbook
               </Link>
             </li>
             <li>

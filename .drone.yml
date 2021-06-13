@@ -2,10 +2,15 @@ kind: pipeline
 type: docker
 name: default
 
+trigger:
+  branch:
+    exclude:
+      - renovate/*
+
 steps:
   - name: restore-cache-with-filesystem
     image: meltwater/drone-cache:dev
-    pull: true
+    pull: 'always'
     settings:
       restore: true
       cache_key: '{{ .Repo.Name }}-{{ checksum "yarn.lock" }}'
@@ -14,13 +19,8 @@ steps:
       region: us-east-1
       # filesystem_cache_root: "/tmp/cache"
       mount:
-        - 'node_modules'
         - '.cache'
         - 'public'
-    when:
-      branch:
-        exclude:
-          - 'renovate/*'
     environment:
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
@@ -31,7 +31,7 @@ steps:
         path: /tmp/cache
 
   - name: install
-    image: node
+    image: node:lts-buster-slim
     commands:
       - yarn install --frozen-lockfile
     when:
@@ -41,13 +41,11 @@ steps:
           - develop
           - 'feature/*'
           - 'hotfix/*'
-        exlude:
-          - 'renovate/*'
     depends_on:
       - restore-cache-with-filesystem
 
   - name: build
-    image: node
+    image: node:lts-buster-slim
     commands:
       - yarn build
     when:
@@ -57,8 +55,6 @@ steps:
           - develop
           - 'feature/*'
           - 'hotfix/*'
-        exlude:
-          - 'renovate/*'
     environment:
       DATO_API_TOKEN:
         from_secret: DATO_API_TOKEN
@@ -69,7 +65,7 @@ steps:
 
   - name: rebuild-cache-with-filesystem
     image: meltwater/drone-cache:dev
-    pull: true
+    pull: 'always'
     settings:
       rebuild: true
       cache_key: '{{ .Repo.Name }}-{{ checksum "yarn.lock" }}'
@@ -78,16 +74,11 @@ steps:
       region: us-east-1
       # filesystem_cache_root: "/tmp/cache"
       mount:
-        - 'node_modules'
         - '.cache'
         - 'public'
     volumes:
       - name: cache
         path: /tmp/cache
-    when:
-      branch:
-        exclude:
-          - 'renovate/*'
     environment:
       AWS_ACCESS_KEY_ID:
         from_secret: aws_access_key_id
@@ -97,21 +88,21 @@ steps:
       - install
       - build
 
-  # - name: tests
-  #   image: cypress/included:6.5.0
-  #   commands:
-  #     - cypress install
-  #     - yarn test:e2e:ci
-  #   environment:
-  #     DATO_API_TOKEN:
-  #       from_secret: DATO_API_TOKEN
-  #     GATSBY_SENTRY_DSN:
-  #       from_secret: GATSBY_SENTRY_DSN
-  #   depends_on:
-  #     - install
+  - name: Test Chrome
+    image: cypress/included:7.1.0
+    commands:
+      - cypress install
+      - yarn test:e2e:ci-chrome
+    environment:
+      DATO_API_TOKEN:
+        from_secret: DATO_API_TOKEN
+      GATSBY_SENTRY_DSN:
+        from_secret: GATSBY_SENTRY_DSN
+    depends_on:
+      - install
 
   - name: deploy
-    image: node
+    image: node:lts-buster-slim
     commands:
       - yarn global add firebase-tools firebase-ci
       - firebase-ci deploy
@@ -146,6 +137,21 @@ steps:
     depends_on:
       - build
       - deploy
+      - 'Test Chrome'
+
+  - name: sentry-release
+    image: stiforr/ci-tools:latest
+    commands:
+      - export SENTRY_RELEASE=$DRONE_TAG
+      - export SENTRY_ENVIRONMENT=$(/scripts/environment.sh)
+      - sentry-cli releases new $SENTRY_RELEASE -p $SENTRY_PROJECT
+      - sentry-cli releases set-commits $SENTRY_RELEASE --auto
+      - sentry-cli releases files $SENTRY_RELEASE upload-sourcemaps ./public
+      - sentry-cli releases finalize $SENTRY_RELEASE
+      - sentry-cli releases deploys $SENTRY_RELEASE new -e $SENTRY_ENVIRONMENT
+    when:
+      event:
+        - tag
 
 volumes:
   - name: cache

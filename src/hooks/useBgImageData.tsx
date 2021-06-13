@@ -7,7 +7,7 @@ const useBgImageData = (): BGTags => {
       query BGTags {
         desktopBgImage: allDatoCmsAsset(
           filter: { tags: { in: "bg" } }
-          sort: { fields: createdAt, order: DESC }
+          sort: { fields: filename, order: ASC }
         ) {
           edges {
             node {
@@ -25,7 +25,7 @@ const useBgImageData = (): BGTags => {
         }
         mobileBgImage: allDatoCmsAsset(
           filter: { tags: { in: "bg" } }
-          sort: { fields: createdAt, order: DESC }
+          sort: { fields: filename, order: ASC }
         ) {
           edges {
             node {

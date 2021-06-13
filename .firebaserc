@@ -1,6 +1,6 @@
 {
   "projects": {
     "default": "treats-portfolio",
-    "master": "treats-portfolio"
+    "main": "treats-portfolio"
   }
 }

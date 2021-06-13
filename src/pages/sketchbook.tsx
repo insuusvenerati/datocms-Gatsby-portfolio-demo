@@ -1,10 +1,10 @@
 import React from 'react';
 import { PageProps } from 'gatsby';
 import Layout from '../components/Layout';
-import * as Sentry from '@sentry/react';
+import * as Sentry from '@sentry/gatsby';
 import VisdevImageContainer from '../components/VisdevImageContainer';
 
-const VisdevPage: React.FC<PageProps> = () => (
+const SketchbookPage: React.FC<PageProps> = () => (
   <Layout>
     <Sentry.ErrorBoundary fallback={<h1>Error</h1>}>
       <VisdevImageContainer />
@@ -12,4 +12,4 @@ const VisdevPage: React.FC<PageProps> = () => (
   </Layout>
 );
 
-export default VisdevPage;
+export default SketchbookPage;

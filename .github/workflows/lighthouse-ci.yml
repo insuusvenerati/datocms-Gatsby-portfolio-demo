@@ -8,6 +8,8 @@ jobs:
       DATO_API_TOKEN: ${{ secrets.DATO_API_TOKEN }}
       LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
       LHCI_TOKEN: ${{ secrets.LHCI_TOKEN }}
+      LHCI_USER: ${{ secrets.LHCI_USER }}
+      LHCI_PASS: ${{ secrets.LHCI_PASS }}
     steps:
       - uses: actions/checkout@v2
 

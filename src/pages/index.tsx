@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/react';
+import * as Sentry from '@sentry/gatsby';
 import { PageProps } from 'gatsby';
 import * as React from 'react';
 import BgImageContainer from '../components/BgImageContainer';

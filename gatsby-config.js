@@ -1,6 +1,7 @@
 require('dotenv').config({
   path: '.env',
 });
+const packageJson = require('./package.json');
 
 const plugins = [
   'gatsby-plugin-react-helmet',
@@ -56,7 +57,14 @@ const plugins = [
   {
     resolve: `gatsby-plugin-offline`,
     options: {
-      precachePages: [`/visdev/`, `/about/`, '/'],
+      precachePages: [`/sketchbook/`, `/about/`, '/'],
+    },
+  },
+  {
+    resolve: '@sentry/gatsby',
+    options: {
+      dsn: 'https://50863e41f2c94ac38144e896197d498f@o122225.ingest.sentry.io/4167682',
+      release: packageJson.version,
     },
   },
   // `gatsby-plugin-codegen`,
